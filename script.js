@@ -244,13 +244,13 @@ $(function () {
           document.getElementById("audio").pause();
           document.getElementById("audioCrash").play();
           Swal.fire({
-            title: "OH NO YOU CRASHED!",
+            title: "OH NO!",
             text:
               "You managed to travel " +
               totalKm +
               " km. Do you want to try again to see if you can go further?",
-            confirmButtonColor: "#9b2323",
-            confirmButtonText: "PLAY AGAIN",
+            confirmButtonColor: "#23239b",
+            confirmButtonText: "GO AGAIN",
             allowOutsideClick: false,
           }).then(function (result) {
             if (result.value) {
