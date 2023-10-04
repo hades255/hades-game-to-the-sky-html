@@ -1,28 +1,35 @@
 let gameOver = true;
 let moveLeft = false;
 let moveRight = false;
+let moveUp = false;
+let moveDown = false;
 
 // turning them into abbreviated variables so it's easier to write later on
-let rH = $('.rocketHeight')
-let rW = $('.rocketWidth')
-let aH1 = $('.asteroidHeightOne')
-let aH2 = $('.asteroidHeightTwo')
-let aH3 = $('.asteroidHeightThree')
-let aH4 = $('.asteroidHeightFour')
-let aW1 = $('.asteroidWidthOne')
-let aW2 = $('.asteroidWidthTwo')
-let aW3 = $('.asteroidWidthThree')
-let aW4 = $('.asteroidWidthFour')
+let rH = $(".rocketHeight");
+let rW = $(".rocketWidth");
+let aH1 = $(".asteroidHeightOne");
+let aH2 = $(".asteroidHeightTwo");
+let aH3 = $(".asteroidHeightThree");
+let aH4 = $(".asteroidHeightFour");
+let aW1 = $(".asteroidWidthOne");
+let aW2 = $(".asteroidWidthTwo");
+let aW3 = $(".asteroidWidthThree");
+let aW4 = $(".asteroidWidthFour");
 
 // Getting the document ready
 $(function () {
   // Sweet Alert to start the game
   Swal.fire({
-    title: 'WELCOME!',
-    html: "<p>While you are out on a <em> super secret and important </em> space mission, your friend challenges you to see how far you can travel through the asteroid belt without getting hit!!</p> <p> Use <strong> left </strong> and <strong> right </strong> arrows to dodge the asteroids.</p> <p> If you're using a touch screen: <strong> tap </strong> on the left or right side of the screen to move.</p>",
-    confirmButtonColor: '#9b2323',
-    confirmButtonText: "START",
-    allowOutsideClick: false
+    title: "WELCOME!",
+    html: `Blast off into an intergalactic adventure in <br>"To the SKY"!<br>
+     Take control of a brave rocket as it soars through the sky, navigating a treacherous asteroid field.<br>
+     Dodge, duck, and weave your way to victory in this simple yet hilarious game.<br><br>
+     <b>Up</b><br>
+     <b>Left</b>,<b>Right</b><br>
+     <b>Down</b>,`,
+    confirmButtonColor: "#23239b",
+    confirmButtonText: "Go",
+    allowOutsideClick: false,
   }).then(function (result) {
     if (result.value) {
       gameOver = false;
@@ -30,18 +37,22 @@ $(function () {
     }
 
     // [MOVE LEFT AND RIGHT WITH ARROW KEYS]
-    $(document).on('keydown', function (e) {
+    $(document).on("keydown", function (e) {
       if (gameOver === false) {
         let key = e.keyCode;
         if (key === 37 && moveLeft === false) {
           moveLeft = requestAnimationFrame(left);
         } else if (key === 39 && moveRight === false) {
           moveRight = requestAnimationFrame(right);
+        } else if (key === 38 && moveUp === false) {
+          moveUp = requestAnimationFrame(up);
+        } else if (key === 40 && moveDown === false) {
+          moveDown = requestAnimationFrame(down);
         }
       }
     });
 
-    $(document).on('keyup', function (e) {
+    $(document).on("keyup", function (e) {
       if (gameOver === false) {
         let key = e.keyCode;
         if (key === 37) {
@@ -50,26 +61,41 @@ $(function () {
         } else if (key === 39) {
           cancelAnimationFrame(moveRight);
           moveRight = false;
+        } else if (key === 38) {
+          cancelAnimationFrame(moveUp);
+          moveUp = false;
+        } else if (key === 40) {
+          cancelAnimationFrame(moveDown);
+          moveDown = false;
         }
       }
     });
 
     // [MOVE LEFT AND RIGHT USING TOUCH]
-    $(document).on('touchstart', function (e) {
+    $(document).on("touchstart", function (e) {
       let gameWidth = $(".gameArea").width();
+      let gameHeight = $(".gameArea").height();
       let touchX = e.touches[0].clientX;
+      let touchY = e.touches[0].clientY;
       if (gameOver === false) {
         if (touchX > gameWidth / 2 && moveLeft === false) {
           moveRight = requestAnimationFrame(right);
         } else if (moveRight === false) {
           moveLeft = requestAnimationFrame(left);
         }
+        if (touchY > gameHeight / 2 && moveUp === false) {
+          moveDown = requestAnimationFrame(down);
+        } else if (moveDown === false) {
+          moveUp = requestAnimationFrame(up);
+        }
       }
     });
 
-    $(document).on('touchend', function (e) {
+    $(document).on("touchend", function (e) {
       let gameWidth = $(".gameArea").width();
+      let gameHeight = $(".gameArea").height();
       let touchesX = e.changedTouches[0].clientX;
+      let touchesY = e.changedTouches[0].clientY;
       if (gameOver === false) {
         if (touchesX > gameWidth / 2) {
           cancelAnimationFrame(moveRight);
@@ -78,6 +104,13 @@ $(function () {
           cancelAnimationFrame(moveLeft);
           moveLeft = false;
         }
+        if (touchesY > gameHeight / 2) {
+          cancelAnimationFrame(moveUp);
+          moveUp = false;
+        } else {
+          cancelAnimationFrame(moveDown);
+          moveDown = false;
+        }
       }
     });
 
@@ -85,27 +118,79 @@ $(function () {
     let left = function () {
       //if the rocketArea is going left but over 0px, then it can keep moving left - 5px from its current position
       if (gameOver === false && parseInt($(".rocketArea").css("left")) > 10) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) - 5);
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) - 5
+        );
         moveLeft = requestAnimationFrame(left);
-
       } // left movement will speed up after certain km reached
       if (totalKm >= 160) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) - 4);
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) - 4
+        );
       } else if (totalKm >= 80) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) - 2);
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) - 2
+        );
       }
     };
 
     let right = function () {
       //if the rocketArea is going right but under 350px, then it can keep moving right + 5px from its current position
-      if (gameOver === false && parseInt($(".rocketArea").css("left")) < parseInt($(".gameArea").css("width")) - 25) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) + 5);
+      if (
+        gameOver === false &&
+        parseInt($(".rocketArea").css("left")) <
+          parseInt($(".gameArea").css("width")) - 25
+      ) {
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) + 5
+        );
         moveRight = requestAnimationFrame(right);
       } // right movement will speed up after certain km reached
       if (totalKm >= 160) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) + 4);
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) + 4
+        );
       } else if (totalKm >= 80) {
-        $(".rocketArea").css("left", parseInt($(".rocketArea").css("left")) + 2);
+        $(".rocketArea").css(
+          "left",
+          parseInt($(".rocketArea").css("left")) + 2
+        );
+      }
+    };
+
+    // [LEFT AND RIGHT ANIMATION AND SPEED]
+    let up = function () {
+      //if the rocketArea is going left but over 0px, then it can keep moving left - 5px from its current position
+      if (gameOver === false && parseInt($(".rocketArea").css("top")) > 50) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) - 5);
+        moveUp = requestAnimationFrame(up);
+      } // top movement will speed up after certain km reached
+      if (totalKm >= 160) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) - 4);
+      } else if (totalKm >= 80) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) - 2);
+      }
+    };
+
+    let down = function () {
+      //if the rocketArea is going right but under 350px, then it can keep moving right + 5px from its current position
+      if (
+        gameOver === false &&
+        parseInt($(".rocketArea").css("top")) <
+          parseInt($(".gameArea").css("height")) - 80
+      ) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) + 3);
+        moveDown = requestAnimationFrame(down);
+      } // right movement will speed up after certain km reached
+      if (totalKm >= 160) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) + 2);
+      } else if (totalKm >= 80) {
+        $(".rocketArea").css("top", parseInt($(".rocketArea").css("top")) + 1);
       }
     };
 
@@ -138,78 +223,98 @@ $(function () {
     function repeat() {
       if (gameOver === false) {
         // if rocket height/width hits any of the meteor heights/widths then game over
-        if (collision(rH, aH1) || collision(rH, aH2) || collision(rH, aH3) || collision(rH, aH4) || collision(rH, aW1) || collision(rH, aW2) || collision(rH, aW3) || collision(rH, aW4) || collision(rW, aH1) || collision(rW, aH2) || collision(rW, aH3) || collision(rW, aH4) || collision(rW, aW1) || collision(rW, aW2) || collision(rW, aW3) || collision(rW, aW4)) {
+        if (
+          collision(rH, aH1) ||
+          collision(rH, aH2) ||
+          collision(rH, aH3) ||
+          collision(rH, aH4) ||
+          collision(rH, aW1) ||
+          collision(rH, aW2) ||
+          collision(rH, aW3) ||
+          collision(rH, aW4) ||
+          collision(rW, aH1) ||
+          collision(rW, aH2) ||
+          collision(rW, aH3) ||
+          collision(rW, aH4) ||
+          collision(rW, aW1) ||
+          collision(rW, aW2) ||
+          collision(rW, aW3) ||
+          collision(rW, aW4)
+        ) {
           document.getElementById("audio").pause();
           document.getElementById("audioCrash").play();
           Swal.fire({
-            title: 'OH NO YOU CRASHED!',
-            text: 'You managed to travel ' + totalKm + ' km. Do you want to try again to see if you can go further?',
-            confirmButtonColor: '#9b2323',
-            confirmButtonText: 'PLAY AGAIN',
+            title: "OH NO YOU CRASHED!",
+            text:
+              "You managed to travel " +
+              totalKm +
+              " km. Do you want to try again to see if you can go further?",
+            confirmButtonColor: "#9b2323",
+            confirmButtonText: "PLAY AGAIN",
             allowOutsideClick: false,
           }).then(function (result) {
             if (result.value) {
               location.reload(true);
             }
-          })
+          });
           gameEnds();
         }
         requestAnimationFrame(repeat);
       }
-      starFalling($('.starOne'));
-      starFalling($('.starTwo'));
-      starFalling($('.starThree'));
-      starFalling($('.starFour'));
+      starFalling($(".starOne"));
+      starFalling($(".starTwo"));
+      starFalling($(".starThree"));
+      starFalling($(".starFour"));
 
-      asteroidFalling($('.asteroidAreaOne'));
-      asteroidFalling($('.asteroidAreaTwo'));
-      asteroidFalling($('.asteroidAreaThree'));
-      asteroidFalling($('.asteroidAreaFour'));
-    };
+      asteroidFalling($(".asteroidAreaOne"));
+      asteroidFalling($(".asteroidAreaTwo"));
+      asteroidFalling($(".asteroidAreaThree"));
+      asteroidFalling($(".asteroidAreaFour"));
+    }
 
     // [ASTEROID ANIMATIONS]
     // speeds up every 10 seconds
     function asteroidFalling(asteroid) {
-      let topOfArea = parseInt(asteroid.css('top'));
-      if (topOfArea > parseInt($('.gameArea').css('height'))) {
+      let topOfArea = parseInt(asteroid.css("top"));
+      if (topOfArea > parseInt($(".gameArea").css("height"))) {
         topOfArea = -150;
         let randomPosition = parseInt(Math.random() * 360);
-        asteroid.css('left', randomPosition);
+        asteroid.css("left", randomPosition);
       }
-      asteroid.css('top', topOfArea + 4);
+      asteroid.css("top", topOfArea + 4);
 
       if (totalKm >= 400) {
-        asteroid.css('top', topOfArea + 10);
+        asteroid.css("top", topOfArea + 10);
       } else if (totalKm >= 320) {
-        asteroid.css('top', topOfArea + 8);
+        asteroid.css("top", topOfArea + 8);
       } else if (totalKm >= 240) {
-        asteroid.css('top', topOfArea + 7);
+        asteroid.css("top", topOfArea + 7);
       } else if (totalKm >= 160) {
-        asteroid.css('top', topOfArea + 6);
+        asteroid.css("top", topOfArea + 6);
       } else if (totalKm >= 80) {
-        asteroid.css('top', topOfArea + 5);
+        asteroid.css("top", topOfArea + 5);
       }
     }
 
     // [STAR ANIMATIONS]
     // speeds up every 10 seconds
     function starFalling(star) {
-      let topOfAreaStar = parseInt(star.css('top'));
-      if (topOfAreaStar > parseInt($('.gameArea').css('height'))) {
+      let topOfAreaStar = parseInt(star.css("top"));
+      if (topOfAreaStar > parseInt($(".gameArea").css("height"))) {
         topOfAreaStar = -100;
         let randomPositionStar = parseInt(Math.random() * 350);
-        star.css('left', randomPositionStar);
+        star.css("left", randomPositionStar);
       }
-      star.css('top', topOfAreaStar + 10);
+      star.css("top", topOfAreaStar + 10);
 
       if (totalKm >= 400) {
-        star.css('top', topOfAreaStar + 20);
+        star.css("top", topOfAreaStar + 20);
       } else if (totalKm >= 320) {
-        star.css('top', topOfAreaStar + 16);
+        star.css("top", topOfAreaStar + 16);
       } else if (totalKm >= 240) {
-        star.css('top', topOfAreaStar + 13);
+        star.css("top", topOfAreaStar + 13);
       } else if (totalKm >= 80) {
-        star.css('top', topOfAreaStar + 11);
+        star.css("top", topOfAreaStar + 11);
       }
     }
 
